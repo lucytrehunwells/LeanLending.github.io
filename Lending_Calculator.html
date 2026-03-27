@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lean — Business Case Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --coal:       #1C2024;
+  --white:      #FFFFFF;
+  --steel:      #60646C;
+  --green:      #299764;
+  --green-dim:  #29976414;
+  --green-mid:  #29976435;
+  --light-gray: #B9BBC6;
+  --red:        #C62A2F;
+  --red-dim:    #C62A2F12;
+  --yellow:     #915930;
+  --yellow-dim: #91593014;
+  --cyan:       #256E93;
+  --cyan-dim:   #256E9314;
+  --bg:         #F4F5F7;
+  --surface:    #FFFFFF;
+  --border:     #E3E4EA;
+  --border-mid: #CACBD5;
+  --text:       #1C2024;
+  --text-sub:   #60646C;
+  --text-muted: #B9BBC6;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5; min-height: 100vh; }
+
+/* HEADER */
+header { background: var(--coal); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 52px; position: sticky; top: 0; z-index: 100; }
+.logo-wrap { display: flex; align-items: center; gap: 10px; }
+.logo-img { width: 28px; height: 28px; object-fit: contain; }
+.logo-text { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 15px; letter-spacing: 0.12em; color: var(--white); text-transform: uppercase; }
+.header-center { font-size: 11px; color: var(--light-gray); letter-spacing: 0.03em; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.hdate { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--steel); }
+.export-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; padding: 6px 14px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--white); transition: all 0.15s; }
+.export-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* LAYOUT */
+.shell { display: grid; grid-template-columns: 356px 1fr; min-height: calc(100vh - 52px); }
+.panel-left { border-right: 1px solid var(--border); background: var(--surface); padding: 20px 18px; overflow-y: auto; display: flex; flex-direction: column; }
+.panel-right { background: var(--bg); padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+
+/* LEGEND */
+.legend { padding: 10px 12px; background: var(--bg); border-radius: 5px; border: 1px solid var(--border); margin-bottom: 18px; }
+.legend-title { font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.li { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-sub); margin-bottom: 5px; }
+.li:last-child { margin-bottom: 0; }
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+.tag-d { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid); }
+.tag-l { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #91593025; }
+.tag-c { background: var(--cyan-dim); color: var(--cyan); border: 1px solid #256E9325; }
+
+/* PILLAR */
+.pillar { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px; }
+.pillar:last-child { border-bottom: none; margin-bottom: 0; }
+.ph { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 11px; }
+.pbadge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500; color: var(--green); background: var(--green-dim); border: 1px solid var(--green-mid); padding: 2px 7px; border-radius: 3px; white-space: nowrap; margin-top: 2px; }
+.ptitle { font-weight: 600; font-size: 12px; color: var(--text); }
+.psub { font-size: 10px; color: var(--text-sub); margin-top: 1px; }
+
+/* FIELDS */
+.fg { display: flex; flex-direction: column; gap: 8px; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.flabel { font-size: 11px; color: var(--text-sub); font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+input[type="number"], input[type="text"] {
+  width: 100%; background: var(--surface); border: 1px solid var(--border-mid); border-radius: 4px;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 7px 10px;
+  transition: border-color 0.15s, box-shadow 0.15s; -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-dim); }
+input::placeholder { color: var(--text-muted); }
+.fhint { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.fassume { font-size: 10px; color: var(--yellow); display: flex; align-items: flex-start; gap: 4px; margin-top: 1px; }
+.fassume::before { content: "⚡"; flex-shrink: 0; }
+.lean-input { border-color: #91593030; background: #FFFBF7; }
+.lean-input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px var(--yellow-dim); }
+
+/* RIGHT PANEL */
+.section-label {
+  font-size: 10px; font-weight: 600; color: var(--steel); text-transform: uppercase;
+  letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.lender-bar { display: flex; align-items: flex-start; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 16px 20px; }
+.lname { font-weight: 700; font-size: 22px; color: var(--text); min-height: 30px; letter-spacing: -0.3px; }
+.ldate { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+.transfer-note { text-align: right; }
+.tn-label { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; }
+.tn-item { font-size: 11px; color: var(--text-sub); }
+
+/* IMPACT CARDS */
+.impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ic {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 7px;
+  padding: 16px; transition: border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+}
+.ic.active-g { border-color: var(--green); box-shadow: 0 0 0 1px var(--green-mid); }
+.ic.active-a { border-color: var(--yellow); box-shadow: 0 0 0 1px #91593025; }
+.ic.active-c { border-color: var(--cyan); box-shadow: 0 0 0 1px #256E9325; }
+.ic-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ic-label { font-size: 10px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
+.ic-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+.ic.active-g .ic-dot { background: var(--green); }
+.ic.active-a .ic-dot { background: var(--yellow); }
+.ic.active-c .ic-dot { background: var(--cyan); }
+.ic-value { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 22px; color: var(--text-muted); letter-spacing: -0.5px; line-height: 1; }
+.ic.active-g .ic-value { color: var(--green); }
+.ic.active-a .ic-value { color: var(--yellow); }
+.ic.active-c .ic-value { color: var(--cyan); }
+.ic-sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+/* TOTAL */
+.total-bar {
+  background: var(--coal); border-radius: 7px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.total-left { }
+.total-label { font-size: 10px; font-weight: 600; color: var(--light-gray); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.total-value { font-weight: 700; font-size: 28px; color: var(--green); letter-spacing: -0.5px; }
+.csc-label { font-size: 10px; font-weight: 600; color: var(--light-gray); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; text-align: right; }
+.csc-value { font-weight: 700; font-size: 20px; color: var(--red); letter-spacing: -0.3px; text-align: right; }
+.csc-note { font-size: 10px; color: var(--steel); text-align: right; margin-top: 2px; }
+
+/* BREAKDOWN */
+.bk { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.bkh { display: grid; grid-template-columns: 1fr 1.2fr 0.7fr; background: #F8F9FA; border-bottom: 1px solid var(--border); }
+.bhc { padding: 8px 14px; font-size: 10px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; border-right: 1px solid var(--border); }
+.bhc:last-child { border-right: none; text-align: right; }
+.bks { border-bottom: 1px solid var(--border); }
+.bks:last-child { border-bottom: none; }
+.bksh { padding: 8px 14px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+.br { display: grid; grid-template-columns: 1fr 1.2fr 0.7fr; border-bottom: 1px solid var(--border); }
+.br:last-child { border-bottom: none; }
+.bc { padding: 8px 14px; font-size: 12px; color: var(--text-sub); border-right: 1px solid var(--border); }
+.bc:first-child { color: var(--text); }
+.bc:last-child { border-right: none; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.bc.g { color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.bc.a { color: var(--yellow); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.bc.c { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.bc.r { color: var(--red); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+/* ROI */
+.roic { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 18px 20px; }
+.roig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; }
+.rii { display: flex; flex-direction: column; gap: 3px; }
+.ril { font-size: 10px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
+.riv { font-weight: 700; font-size: 20px; color: var(--text-muted); letter-spacing: -0.3px; }
+.riv.g { color: var(--green); }
+.riv.r { color: var(--red); }
+.riv.p { font-size: 13px; color: var(--text-muted); font-style: italic; font-weight: 400; }
+.roi-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+
+/* EXPORT NOTE */
+.enote { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+.enote-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.enote-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.enote-body { font-size: 11px; color: var(--text-sub); line-height: 1.6; }
+
+/* FOOTER */
+.page-footer { padding: 12px 0 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.pf-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+
+.div { height: 1px; background: var(--border); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+@media print { header, .panel-left { display: none; } .shell { grid-template-columns: 1fr; } .panel-right { padding: 20px; } body { background: white; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap" style="display:flex;align-items:center;gap:14px;">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMxIiBoZWlnaHQ9IjEzNiIgdmlld0JveD0iMCAwIDMzMSAxMzYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMjkuMDc2IDU5LjA4NTdMMTA5LjIzNyAyNC45MTQzQzEwNy42NTMgMjIuMjAxIDEwNS4zNzkgMTkuOTQ5IDEwMi42NDIgMTguMzg0NEM5OS45MDU0IDE2LjgxOTggOTYuODAyNyAxNS45OTc1IDkzLjY0NTIgMTZINTQuMDExMkM1MC44NDk5IDE1Ljk5MzYgNDcuNzQyNiAxNi44MTQxIDQ1LjAwMTYgMTguMzc4OUM0Mi4yNjA3IDE5Ljk0MzcgMzkuOTgyOCAyMi4xOTc3IDM4LjM5NjkgMjQuOTE0M0wxOC41NjQ5IDU5LjA4NTdDMTYuOTk5OSA2MS43OTk0IDE2LjE3NjUgNjQuODcyNSAxNi4xNzY1IDY4QzE2LjE3NjUgNzEuMTI3NSAxNi45OTk5IDc0LjIwMDYgMTguNTY0OSA3Ni45MTQzTDM4LjM5NjkgMTExLjA4NkMzOS45ODA5IDExMy43OTkgNDIuMjU1MyAxMTYuMDUxIDQ0Ljk5MTkgMTE3LjYxNkM0Ny43Mjg2IDExOS4xOCA1MC44MzEyIDEyMC4wMDIgNTMuOTg4OCAxMjBIOTMuNjIyOEM5Ni43ODAzIDEyMC4wMDIgOTkuODgzIDExOS4xOCAxMDIuNjIgMTE3LjYxNkMxMDUuMzU2IDExNi4wNTEgMTA3LjYzMSAxMTMuNzk5IDEwOS4yMTUgMTExLjA4NkwxMjkuMDc2IDc2LjkxNDNDMTMwLjY0NSA3NC4yMDE4IDEzMS40NzEgNzEuMTI4MiAxMzEuNDcxIDY4QzEzMS40NzEgNjQuODcxOCAxMzAuNjQ1IDYxLjc5ODIgMTI5LjA3NiA1OS4wODU3Wk0xMTIuOTMxIDcyLjIxMkgxMDguNjU0QzEwNy45MSA3Mi4yMTI0IDEwNy4xNzkgNzIuNDA2OCAxMDYuNTM1IDcyLjc3NThDMTA1Ljg5MSA3My4xNDQ3IDEwNS4zNTUgNzMuNjc1MiAxMDQuOTgyIDc0LjMxNDNMOTkuOTExOCA4Mi45ODM0TDk0Ljg3MTYgOTEuNjUyNkM5NC41MDAyIDkyLjI5MzEgOTQuMzA0NyA5My4wMTk0IDk0LjMwNDcgOTMuNzU4NkM5NC4zMDQ3IDk0LjQ5NzggOTQuNTAwMiA5NS4yMjQgOTQuODcxNiA5NS44NjQ2TDk3LjAxMDMgOTkuNTQxN0M5Ny41MTk0IDEwMC41MDUgOTcuNjMzOCAxMDEuNjI2IDk3LjMyOTYgMTAyLjY3Qzk3LjAyNTQgMTAzLjcxNSA5Ni4zMjYxIDEwNC42MDMgOTUuMzc4MiAxMDUuMTQ3Qzk0LjQzMDMgMTA1LjY5MSA5My4zMDczIDEwNS44NSA5Mi4yNDQxIDEwNS41OUM5MS4xODA5IDEwNS4zMzEgOTAuMjYwMSAxMDQuNjczIDg5LjY3NDMgMTAzLjc1NEw4Ny41MzU2IDEwMC4wNzdDODcuMTY1MSA5OS40MzQ2IDg2LjYzMDMgOTguOTAxMyA4NS45ODU1IDk4LjUzMDhDODUuMzQwNyA5OC4xNjAzIDg0LjYwODcgOTcuOTY1OCA4My44NjM4IDk3Ljk2NjlINjMuNzQwMkM2Mi45OTUzIDk3Ljk2NTggNjIuMjYzMyA5OC4xNjAzIDYxLjYxODUgOTguNTMwOEM2MC45NzM3IDk4LjkwMTMgNjAuNDM4OSA5OS40MzQ2IDYwLjA2ODUgMTAwLjA3N0w1Ny45Mjk3IDEwMy43NTRDNTcuNjY0MSAxMDQuMjU2IDU3LjI5OSAxMDQuNyA1Ni44NTY0IDEwNS4wNTlDNTYuNDEzOCAxMDUuNDE4IDU1LjkwMjggMTA1LjY4NCA1NS4zNTQgMTA1Ljg0MUM1NC44MDUyIDEwNS45OTkgNTQuMjMgMTA2LjA0NSA1My42NjMgMTA1Ljk3NkM1My4wOTU5IDEwNS45MDggNTIuNTQ4NyAxMDUuNzI2IDUyLjA1NDEgMTA1LjQ0MkM1MS41NTk1IDEwNS4xNTggNTEuMTI3NyAxMDQuNzc4IDUwLjc4NDggMTA0LjMyNEM1MC40NDE5IDEwMy44NyA1MC4xOTQ4IDEwMy4zNTIgNTAuMDU4NCAxMDIuODAxQzQ5LjkyMiAxMDIuMjUgNDkuODk5MSAxMDEuNjc3IDQ5Ljk5MTEgMTAxLjExN0M1MC4wODMxIDEwMC41NTcgNTAuMjg4MSAxMDAuMDIxIDUwLjU5MzcgOTkuNTQxN0w1Mi43MzI0IDk1Ljg2NDZDNTMuMTAzOSA5NS4yMjQgNTMuMjk5MyA5NC40OTc4IDUzLjI5OTMgOTMuNzU4NkM1My4yOTkzIDkzLjAxOTQgNTMuMTAzOSA5Mi4yOTMxIDUyLjczMjQgOTEuNjUyNkw0Ny42OTIyIDgyLjk4MzRMNDIuNjUxOSA3NC4zMTQzQzQyLjI3OTMgNzMuNjc0NyA0MS43NDM5IDczLjE0MzggNDEuMDk5NCA3Mi43NzQ4QzQwLjQ1NDkgNzIuNDA1OCAzOS43MjQxIDcyLjIxMTcgMzguOTgwMiA3Mi4yMTJIMzQuNzAyN0MzMy41NzgyIDcyLjIxMiAzMi40OTk3IDcxLjc2ODIgMzEuNzA0NSA3MC45NzgzQzMwLjkwOTMgNzAuMTg4NCAzMC40NjI2IDY5LjExNzEgMzAuNDYyNiA2OEMzMC40NjI2IDY2Ljg4MjkgMzAuOTA5MyA2NS44MTE2IDMxLjcwNDUgNjUuMDIxN0MzMi40OTk3IDY0LjIzMTggMzMuNTc4MiA2My43ODggMzQuNzAyNyA2My43ODhIMzguOTgwMkMzOS43MjQxIDYzLjc4ODQgNDAuNDU0OSA2My41OTQzIDQxLjA5OTQgNjMuMjI1M0M0MS43NDM5IDYyLjg1NjIgNDIuMjc5MyA2Mi4zMjUzIDQyLjY1MTkgNjEuNjg1N0w0Ny42OTIyIDUzLjAxNjZMNTIuNzMyNCA0NC4zNDc1QzUzLjEwMzkgNDMuNzA2OSA1My4yOTkzIDQyLjk4MDcgNTMuMjk5MyA0Mi4yNDE1QzUzLjI5OTMgNDEuNTAyMiA1My4xMDM5IDQwLjc3NiA1Mi43MzI0IDQwLjEzNTVMNTAuNTkzNyAzNi40MjEyQzUwLjI4ODEgMzUuOTQxNyA1MC4wODMxIDM1LjQwNTkgNDkuOTkxMSAzNC44NDU4QzQ5Ljg5OTEgMzQuMjg1OCA0OS45MjIgMzMuNzEzIDUwLjA1ODQgMzMuMTYxOUM1MC4xOTQ4IDMyLjYxMDkgNTAuNDQxOSAzMi4wOTI5IDUwLjc4NDggMzEuNjM5QzUxLjEyNzcgMzEuMTg1MiA1MS41NTk1IDMwLjgwNDkgNTIuMDU0MSAzMC41MjA5QzUyLjU0ODcgMzAuMjM2OSA1My4wOTU5IDMwLjA1NTIgNTMuNjYzIDI5Ljk4NjVDNTQuMjMgMjkuOTE3OSA1NC44MDUyIDI5Ljk2MzggNTUuMzU0IDMwLjEyMTVDNTUuOTAyOCAzMC4yNzkxIDU2LjQxMzggMzAuNTQ1MyA1Ni44NTY0IDMwLjkwNDFDNTcuMjk5IDMxLjI2MjkgNTcuNjY0MSAzMS43MDY4IDU3LjkyOTcgMzIuMjA5Mkw2MC4wNjg1IDM1Ljg4NjNDNjAuNDM4OSAzNi41MjgzIDYwLjk3MzcgMzcuMDYxNiA2MS42MTg1IDM3LjQzMjFDNjIuMjYzMyAzNy44MDI2IDYyLjk5NTMgMzcuOTk3MSA2My43NDAyIDM3Ljk5Nkg4My44OTM3Qzg0LjYzODYgMzcuOTk3MSA4NS4zNzA2IDM3LjgwMjYgODYuMDE1NCAzNy40MzIxQzg2LjY2MDIgMzcuMDYxNiA4Ny4xOTUgMzYuNTI4MyA4Ny41NjU1IDM1Ljg4NjNMODkuNzA0MiAzMi4yMDkyQzkwLjI5IDMxLjI5MDQgOTEuMjEwOCAzMC42MzIyIDkyLjI3NCAzMC4zNzI2QzkzLjMzNzIgMzAuMTEyOSA5NC40NjAzIDMwLjI3MTggOTUuNDA4MSAzMC44MTZDOTYuMzU2IDMxLjM2MDMgOTcuMDU1MyAzMi4yNDc3IDk3LjM1OTUgMzMuMjkyNEM5Ny42NjM3IDM0LjMzNzIgOTcuNTQ5MyAzNS40NTgzIDk3LjA0MDMgMzYuNDIxMkw5NC45MDE1IDQwLjEzNTVDOTQuNTMwMSA0MC43NzYgOTQuMzM0NiA0MS41MDIyIDk0LjMzNDYgNDIuMjQxNUM5NC4zMzQ2IDQyLjk4MDcgOTQuNTMwMSA0My43MDY5IDk0LjkwMTUgNDQuMzQ3NUw5OS45MTE4IDUzLjAxNjZMMTA0Ljk1MiA2MS42ODU3QzEwNS4zMjUgNjIuMzI0OCAxMDUuODYxIDYyLjg1NTMgMTA2LjUwNSA2My4yMjQzQzEwNy4xNSA2My41OTMyIDEwNy44OCA2My43ODc2IDEwOC42MjQgNjMuNzg4SDExMi45MDFDMTE0LjAyNiA2My43ODggMTE1LjEwNCA2NC4yMzE4IDExNS45IDY1LjAyMTdDMTE2LjY5NSA2NS44MTE2IDExNy4xNDEgNjYuODgyOSAxMTcuMTQxIDY4QzExNy4xNDEgNjkuMTE3MSAxMTYuNjk1IDcwLjE4ODQgMTE1LjkgNzAuOTc4M0MxMTUuMTA0IDcxLjc2ODIgMTE0LjAyNiA3Mi4yMTIgMTEyLjkwMSA3Mi4yMTJIMTEyLjkzMVoiIGZpbGw9IndoaXRlIiBzdHlsZT0iZmlsbDp3aGl0ZTtmaWxsLW9wYWNpdHk6MTsiLz4KPHBhdGggZD0iTTIxMC4wNTYgMjkuODg5OUMyMTAuMzk2IDMwLjIwOTkgMjEwLjgwNiAzMC40NTk5IDIxMS4yNDYgMzAuNjE5OUMyMTEuNjQ2IDMwLjc2OTkgMjEyLjA1NiAzMC44Mzk5IDIxMi40NjYgMzAuODM5OUMyMTIuNTE2IDMwLjgzOTkgMjEyLjU3NiAzMC44Mzk5IDIxMi42MjYgMzAuODM5OUgyMTIuNjM2QzIxMy43ODYgMzAuODM5OSAyMTQuNjc2IDMwLjUyOTkgMjE1LjI2NiAyOS45Mjk5QzIxNS44NTYgMjkuMzI5OSAyMTYuMTU2IDI4LjQyOTkgMjE2LjE1NiAyNy4yNzk5QzIxNi4xNzYgMjYuODA5OSAyMTYuMTA2IDI2LjM0OTkgMjE1Ljk0NiAyNS45MDk5QzIxNS43ODYgMjUuNDc5OSAyMTUuNTM2IDI1LjA4OTkgMjE1LjE4NiAyNC43MTk5QzIxNC44NDYgMjQuMzk5OSAyMTQuNDQ2IDI0LjE1OTkgMjE0LjAwNiAyMy45OTk5QzIxMy41NjYgMjMuODM5OSAyMTMuMTA2IDIzLjc2OTkgMjEyLjY0NiAyMy43ODk5QzIxMi4xNjYgMjMuNzY5OSAyMTEuNjk2IDIzLjgzOTkgMjExLjI0NiAyNC4wMDk5QzIxMC43OTYgMjQuMTY5OSAyMTAuMzk2IDI0LjQxOTkgMjEwLjAyNiAyNC43Njk5QzIwOS42OTYgMjUuMDk5OSAyMDkuNDQ2IDI1LjQ4OTkgMjA5LjI4NiAyNS45MTk5QzIwOS4xMTYgMjYuMzU5OSAyMDkuMDQ2IDI2LjgwOTkgMjA5LjA2NiAyNy4yNDk5QzIwOS4wMzYgMjcuNzI5OSAyMDkuMTE2IDI4LjE5OTkgMjA5LjI3NiAyOC42NDk5QzIwOS40NDYgMjkuMDk5OSAyMDkuNjk2IDI5LjQ5OTkgMjEwLjA1NiAyOS44Nzk5VjI5Ljg4OTlaIiBmaWxsPSJ3aGl0ZSIgc3R5bGU9ImZpbGw6d2hpdGU7ZmlsbC1vcGFjaXR5OjE7Ii8+CjxwYXRoIGQ9Ik0yODQuMDg2IDIwLjAxOTlMMjgwLjUwNiAyMS44OTk5QzI3OS41OTYgMjIuMzc5OSAyNzguODM2IDIzLjA4OTkgMjc4LjMxNiAyMy45NTk5QzI3Ny43ODYgMjQuODI5OSAyNzcuNTA2IDI1LjgxOTkgMjc3LjUxNiAyNi44Mzk5VjQxLjY2OTlDMjc3LjUxNiA0My4xMzk5IDI3Ny4yMTYgNDQuMTg5OSAyNzYuNjM2IDQ0Ljc3OTlDMjc2LjA0NiA0NS4zNjk5IDI3NS4wMjYgNDUuNjY5OSAyNzMuNTk2IDQ1LjY2OTlIMjYwLjI4NkMyNTkuMTE2IDQ1LjY2OTkgMjU4LjI4NiA0NS40Mjk5IDI1Ny44MTYgNDQuOTQ5OUMyNTcuMzQ2IDQ0LjQ2OTkgMjU3LjExNiA0My42Mjk5IDI1Ny4xMTYgNDIuNDQ5OVYzMS40Nzk5QzI1Ny4xMTYgMzEuMzU5OSAyNTYuOTk2IDMxLjI4OTkgMjU2Ljg4NiAzMS4zMzk5TDI1My4yNjYgMzMuMjQ5OUMyNTIuMzU2IDMzLjcyOTkgMjUxLjU5NiAzNC40Mzk5IDI1MS4wNjYgMzUuMzA5OUMyNTAuNTM2IDM2LjE3OTkgMjUwLjI1NiAzNy4xNzk5IDI1MC4yNTYgMzguMTg5OVY0Mi40Njk5QzI1MC4yNTYgNDMuNjQ5OSAyNTAuMDE2IDQ0LjQ4OTkgMjQ5LjU0NiA0NC45Njk5QzI0OS4wNzYgNDUuNDQ5OSAyNDguMjU2IDQ1LjY4OTkgMjQ3LjA4NiA0NS42ODk5SDIzMi40MzZDMjMxLjI2NiA0NS42ODk5IDIzMC40MzYgNDUuNDQ5OSAyMjkuOTc2IDQ0Ljk2OTlDMjI5LjUwNiA0NC40ODk5IDIyOS4yNjYgNDMuNjQ5OSAyMjkuMjY2IDQyLjQ2OTlWMzEuNDc5OUMyMjkuMjY2IDMxLjM1OTkgMjI5LjEzNiAzMS4yODk5IDIyOS4wMzYgMzEuMzM5OUwyMjUuNDI2IDMzLjI0OTlDMjI0LjUxNiAzMy43Mjk5IDIyMy43NTYgMzQuNDM5OSAyMjMuMjM2IDM1LjMwOTlDMjIyLjcwNiAzNi4xNzk5IDIyMi40MjYgMzcuMTY5OSAyMjIuNDI2IDM4LjE4OTlWNDguNzc5OUMyMjIuNDc2IDQ5LjYxOTkgMjIyLjM0NiA1MC40NDk5IDIyMi4wMjYgNTEuMjI5OUMyMjEuNzA2IDUyLjAxOTkgMjIxLjIzNiA1Mi45Mjk5IDIyMC42MTYgNTMuNTA5OUMyMTkuMzg2IDU0LjU4OTkgMjE2LjY3NiA1NS4zNjk5IDIxMi45MzYgNTUuMzY5OUMyMDkuOTE2IDU1LjM2OTkgMjA4LjU2NiA1NS4yNzk5IDIwNy4xMjYgNTQuNjk5OUMyMDYuMjM2IDU0LjM0OTkgMjA1LjMwNiA1My42Mzk5IDIwNC42NjYgNTIuOTQ5OUMyMDMuMjQ2IDUxLjM0OTkgMjAyLjUwNiA0OS4xNzk5IDIwMi42MDYgNDcuMDE5OUMyMDIuNjA2IDQ0Ljk3OTkgMjAzLjEwNiA0Mi45NDk5IDIwNC4wMzYgNDEuMTI5OUMyMDQuMDM2IDQxLjEyOTkgMjA0LjczNiAzOS43NDk5IDIwNC43NTYgMzkuNzE5OUMyMDQuNzY2IDM5LjY4OTkgMjA0Ljc1NiAzOS42NTk5IDIwNC43MjYgMzkuNjY5OUMyMDQuNzI2IDM5LjY2OTkgMjAwLjI2NiA0MC41NTk5IDE5OS43MTYgNDAuNjg5OUMxOTkuMTE2IDQwLjgzOTkgMTk4LjY2NiA0MS4wMjk5IDE5OC4yNjYgNDEuMzM5OUMxOTcuODY2IDQxLjY0OTkgMTk3LjU0NiA0Mi4wNTk5IDE5Ny4zMTYgNDIuNTI5OUMxOTYuNTI2IDQ0LjI2OTkgMTk2LjE0NiA0Ni4xMDk5IDE5Ni4xNzYgNDcuOTk5OUMxOTYuMTA2IDUxLjEyOTkgMTk3LjE1NiA1NC4yMDk5IDE5OS4xMTYgNTYuNjc5OUMyMDEuNjE2IDU5LjgyOTkgMjA0Ljc5NiA2MS4xMjk5IDIwOC40MTYgNjEuMzk5OUMyMDkuNDk2IDYxLjQ3OTkgMjE1LjkzNiA2MS41Njk5IDIxNy45MzYgNjEuMjk5OUMyMjEuMDM2IDYwLjg4OTkgMjIyLjU1NiA1OS45ODk5IDIyNC4wNDYgNTkuMDM5OUMyMjUuMzM2IDU4LjE1OTkgMjI2LjQyNiA1Ny4wNDk5IDIyNy4yNzYgNTUuNzQ5OUMyMjguMDY2IDU0LjUzOTkgMjI4LjYxNiA1My4yMTk5IDIyOC45MDYgNTEuODE5OUMyMjguOTA2IDUxLjgxOTkgMjI4LjkxNiA1MS44MDk5IDIyOC45MjYgNTEuODA5OUMyMjkuODU2IDUyLjA1OTkgMjMwLjg2NiA1Mi4xODk5IDIzMS43ODYgNTIuMTY5OUgyNDcuNjQ2QzI0OS44MDYgNTIuMjQ5OSAyNTEuOTE2IDUxLjU5OTkgMjUzLjY0NiA1MC4zNDk5QzI1My42NDYgNTAuMzQ5OSAyNTMuNjU2IDUwLjM0OTkgMjUzLjY2NiA1MC4zNDk5QzI1NS4zOTYgNTEuNTk5OSAyNTcuNTE2IDUyLjIzOTkgMjU5LjY1NiA1Mi4xNjk5SDI3My45MzZDMjc2Ljk3NiA1Mi4xNjk5IDI3OS40NDYgNTEuMjY5OSAyODEuMjg2IDQ5LjQ5OTlDMjgzLjI4NiA0Ny41NTk5IDI4NC4zMDYgNDQuOTM5OSAyODQuMzA2IDQxLjcxOTlWMjAuMTU5OUMyODQuMzA2IDIwLjAzOTkgMjg0LjE3NiAxOS45NTk5IDI4NC4wNjYgMjAuMDE5OUgyODQuMDg2WiIgZmlsbD0id2hpdGUiIHN0eWxlPSJmaWxsOndoaXRlO2ZpbGwtb3BhY2l0eToxOyIvPgo8cGF0aCBkPSJNMjU3LjYyNiA1Ni45Mzk5QzI1Ny4yOTYgNTYuNjA5OSAyNTYuODc2IDU2LjM0OTkgMjU2LjQzNiA1Ni4xODk5QzI1NS45OTYgNTYuMDI5OSAyNTUuNTE2IDU1Ljk2OTkgMjU1LjA0NiA1NS45OTk5SDI0Ny40MjZDMjQ2LjI1NiA1NS45OTk5IDI0NS4zNjYgNTYuMjg5OSAyNDQuNzU2IDU2Ljg3OTlDMjQ0LjE1NiA1Ny40NTk5IDI0My44NDYgNTguMzM5OSAyNDMuODQ2IDU5LjQyOTlWNTkuNDU5OUMyNDMuODE2IDU5LjkzOTkgMjQzLjg5NiA2MC40MDk5IDI0NC4wNTYgNjAuODU5OUMyNDQuMjE2IDYxLjMwOTkgMjQ0LjQ2NiA2MS43MDk5IDI0NC44MzYgNjIuMDk5OUMyNDUuMTc2IDYyLjQxOTkgMjQ1LjU4NiA2Mi42Njk5IDI0Ni4wMjYgNjIuODI5OUMyNDYuNDE2IDYyLjk3OTkgMjQ2LjgzNiA2My4wNDk5IDI0Ny4yNDYgNjMuMDQ5OUMyNDcuMzA2IDYzLjA0OTkgMjQ3LjM2NiA2My4wNDk5IDI0Ny40MTYgNjMuMDQ5OUgyNTUuMDQ2QzI1Ni4xOTYgNjMuMDQ5OSAyNTcuMDg2IDYyLjc0OTkgMjU3LjY3NiA2Mi4xMzk5QzI1OC4yNjYgNjEuNTM5OSAyNTguNTY2IDYwLjYzOTkgMjU4LjU2NiA1OS40OTk5QzI1OC42MDYgNTkuMDI5OSAyNTguNTM2IDU4LjU1OTkgMjU4LjM3NiA1OC4xMTk5QzI1OC4yMTYgNTcuNjc5OSAyNTcuOTQ2IDU3LjI3OTkgMjU3LjYxNiA1Ni45NDk5TDI1Ny42MjYgNTYuOTM5OVoiIGZpbGw9IndoaXRlIiBzdHlsZT0iZmlsbDp3aGl0ZTtmaWxsLW9wYWNpdHk6MTsiLz4KPHBhdGggZD0iTTE2OC44NyA4My43NjQ3SDE3Mi45OVYxMDkuMjI0SDE5MC44MzNWMTE1LjI5NEgxNjUuMzUzVjg3LjI1MDZDMTY1LjM1MyA4Ni4zMjYxIDE2NS43MjQgODUuNDM5NCAxNjYuMzgzIDg0Ljc4NTdDMTY3LjA0MyA4NC4xMzIgMTY3LjkzNyA4My43NjQ3IDE2OC44NyA4My43NjQ3WiIgZmlsbD0id2hpdGUiIHN0eWxlPSJmaWxsOndoaXRlO2ZpbGwtb3BhY2l0eToxOyIvPgo8cGF0aCBkPSJNMjI1LjQ2IDEwMS45NTVIMjA5LjA5OFYxMDkuMjI4SDIyOC4xM1YxMTUuMjk0SDIwMS40NjFWODcuMjUwNkMyMDEuNDYxIDg2LjMyNjEgMjAxLjgzMSA4NS40Mzk0IDIwMi40OTEgODQuNzg1N0MyMDMuMTUgODQuMTMyIDIwNC4wNDUgODMuNzY0NyAyMDQuOTc4IDgzLjc2NDdIMjI3Ljg0N1Y4OC4wODk5QzIyNy44NDcgODguMzE4NyAyMjcuODAyIDg4LjU0NTMgMjI3LjcxNCA4OC43NTY4QzIyNy42MjYgODguOTY4MiAyMjcuNDk2IDg5LjE2MDQgMjI3LjMzMyA4OS4zMjIxQzIyNy4xNyA4OS40ODM5IDIyNi45NzYgODkuNjEyMSAyMjYuNzYzIDg5LjY5OTRDMjI2LjU0OSA4OS43ODY3IDIyNi4zMjEgODkuODMxNCAyMjYuMDkgODkuODMwOUgyMDkuMDk4Vjk1Ljg4OTNIMjI1LjQ2VjEwMS45NTVaIiBmaWxsPSJ3aGl0ZSIgc3R5bGU9ImZpbGw6d2hpdGU7ZmlsbC1vcGFjaXR5OjE7Ii8+CjxwYXRoIGQ9Ik0yNDguNTQyIDEwOC4wNzZMMjQ1LjcyNyAxMTUuMjk0SDIzNy44NjJMMjQ5LjgyMyA4NS45NDY4QzI1MC4wODQgODUuMzAyNCAyNTAuNTM1IDg0Ljc1MDEgMjUxLjExNiA4NC4zNjEyQzI1MS42OTcgODMuOTcyMyAyNTIuMzgyIDgzLjc2NDYgMjUzLjA4MyA4My43NjQ3SDI2MC41MDNMMjc0LjAwNSAxMTUuMjk0SDI2NS43MjZMMjYyLjczIDEwOC4wNzZIMjQ4LjU0MlpNMjYwLjYwMSAxMDIuMDA2QzI1Ny42MTMgOTQuNzQxNiAyNTYuMTYyIDkxLjA0ODggMjU1LjM5NyA4OC42NDQySDI1NS4zNTRDMjU0LjY0NCA5MC45ODY0IDI1Mi45NDEgOTUuODA3MyAyNTAuNTI1IDEwMi4wMDZIMjYwLjYwMVoiIGZpbGw9IndoaXRlIiBzdHlsZT0iZmlsbDp3aGl0ZTtmaWxsLW9wYWNpdHk6MTsiLz4KPHBhdGggZD0iTTI4NC40OSAxMTUuMjk0VjgzLjc2NDdIMjkxLjYzOUMyOTIuMjIgODMuNzY2MiAyOTIuNzkzIDgzLjkwOTQgMjkzLjMwNSA4NC4xODE3QzI5My44MTcgODQuNDU0IDI5NC4yNTQgODQuODQ3IDI5NC41NzcgODUuMzI2MkMzMDIuNzIzIDk3LjU5MTMgMzA2LjI0NCAxMDIuNDU5IDMwOC4xNTQgMTA2LjA0NkgzMDguMjQ1QzMwNy45MzQgMTAyLjcxNyAzMDcuOTgxIDk2LjgzNzkgMzA3Ljk4MSA5MS42NTM5VjgzLjc2NDdIMzE1VjExNS4yOTRIMzA4LjQyNkMzMDcuODM2IDExNS4yOTUgMzA3LjI1NSAxMTUuMTQ5IDMwNi43MzggMTE0Ljg2OUMzMDYuMjIgMTE0LjU4OCAzMDUuNzgyIDExNC4xODMgMzA1LjQ2NCAxMTMuNjlDMzAxLjYwOCAxMDcuNzI1IDI5My4wMzcgOTQuNTE1MiAyOTEuMzE2IDkxLjI0NzlIMjkxLjIyNUMyOTEuNDg5IDk1LjE1MTUgMjkxLjQ4OSA5OS42MjkgMjkxLjQ4OSAxMDUuMjI3VjExNS4yOTRIMjg0LjQ5WiIgZmlsbD0id2hpdGUiIHN0eWxlPSJmaWxsOndoaXRlO2ZpbGwtb3BhY2l0eToxOyIvPgo8L3N2Zz4K" alt="LEAN" style="height:22px;width:auto;">
+    <div style="width:1px;height:18px;background:rgba(255,255,255,0.2);flex-shrink:0;"></div>
+    <span style="font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#B9BBC6;letter-spacing:0.03em;">Business Case Calculator</span>
+  </div>
+  <div class="header-center" style="display:none;"></div>
+  <div class="header-right">
+    <span class="hdate" id="datestamp"></span>
+    <button class="export-btn" onclick="window.print()">Export &darr;</button>
+  </div>
+</header>
+
+<div class="shell">
+  <!-- LEFT -->
+  <div class="panel-left">
+
+    <div class="legend">
+      <div class="legend-title">Input key</div>
+      <div class="li"><span class="tag tag-d">discovery</span> Lender&rsquo;s number &mdash; from discovery notes</div>
+      <div class="li"><span class="tag tag-l">lean&nbsp;estimate</span> Lean&rsquo;s assumption &mdash; adjust per client</div>
+      <div class="li"><span class="tag tag-c">commercial</span> From commercial team &mdash; leave blank until confirmed</div>
+    </div>
+
+    <!-- CLIENT -->
+    <div class="pillar">
+      <div class="ph"><div><div class="ptitle">Client</div></div></div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel">Lender name</div>
+          <input type="text" id="lenderName" placeholder="e.g. Tamam Finance" oninput="update()">
+        </div>
+      </div>
+    </div>
+
+    <!-- PILLAR 1 -->
+    <div class="pillar">
+      <div class="ph">
+        <span class="pbadge">P1</span>
+        <div><div class="ptitle">Growth Engine</div><div class="psub">Revenue uplift from improved approvals</div></div>
+      </div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Monthly loan applications</div>
+          <input type="number" id="monthlyApps" placeholder="10000" oninput="update()">
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Current approval rate (%)</div>
+          <input type="number" id="approvalRate" placeholder="45" oninput="update()">
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Average loan size (SAR)</div>
+          <input type="number" id="avgLoan" placeholder="4500" oninput="update()">
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Net margin per loan (%)</div>
+          <input type="number" id="netMargin" placeholder="8" oninput="update()">
+          <span class="fhint">Yield or profit margin on each loan</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Approval rate increase with Lean (%)</div>
+          <input type="number" id="approvalLift" placeholder="3" class="lean-input" oninput="update()">
+          <div class="fassume">Conservative default. Adjust based on lender&rsquo;s current data quality.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PILLAR 2 -->
+    <div class="pillar">
+      <div class="ph">
+        <span class="pbadge">P2</span>
+        <div><div class="ptitle">Risk Architecture</div><div class="psub">Fraud and income misrepresentation losses</div></div>
+      </div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Loan portfolio size (SAR)</div>
+          <input type="number" id="portfolioSize" placeholder="200000000" oninput="update()">
+          <span class="fhint">Total outstanding loan book &mdash; optional</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Fraud / bad debt loss rate (%)</div>
+          <input type="number" id="fraudRate" placeholder="1.5" oninput="update()">
+          <span class="fhint">Optional &mdash; leave blank if not available</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Fraud reduction with Lean (%)</div>
+          <input type="number" id="fraudReduction" placeholder="40" class="lean-input" oninput="update()">
+          <div class="fassume">Bank-verified income significantly reduces misrepresentation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PILLAR 3 -->
+    <div class="pillar">
+      <div class="ph">
+        <span class="pbadge">P3</span>
+        <div><div class="ptitle">Operational Efficiency</div><div class="psub">Cost of manual underwriting and review</div></div>
+      </div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Manual review rate (%)</div>
+          <input type="number" id="manualRate" placeholder="35" oninput="update()">
+          <span class="fhint">% of applications requiring manual underwriting</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Cost per manual review (SAR)</div>
+          <input type="number" id="costPerReview" placeholder="30" oninput="update()">
+          <span class="fhint">Include underwriter time + SIMAH / GOSI costs</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Manual review reduction with Lean (%)</div>
+          <input type="number" id="reviewReduction" placeholder="60" class="lean-input" oninput="update()">
+          <div class="fassume">Adjust based on lender&rsquo;s current automation level.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEAN INVESTMENT -->
+    <div class="pillar">
+      <div class="ph">
+        <span class="pbadge" style="color:var(--cyan);background:var(--cyan-dim);border-color:#256E9325;">INV</span>
+        <div><div class="ptitle">Lean Investment</div><div class="psub">Enter once commercial proposal confirmed</div></div>
+      </div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel"><span class="tag tag-c">commercial</span> Lean annual cost (SAR)</div>
+          <input type="number" id="leanCost" placeholder="Leave blank until confirmed" oninput="update()">
+          <span class="fhint">ROI and payback calculate once this is entered</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel-right">
+
+    <!-- CLIENT HEADER -->
+    <div class="lender-bar">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Business Case Output</div>
+        <div class="lname" id="nameDisplay">&mdash;</div>
+        <div class="ldate" id="dateDisplay"></div>
+      </div>
+      <div class="transfer-note">
+        <div class="tn-label">Transfer figures to deck</div>
+        <div class="tn-item">Slide 18 &rarr; Revenue, Fraud, Ops, Total</div>
+        <div class="tn-item">Slide 4 &rarr; Current State Cost</div>
+      </div>
+    </div>
+
+    <!-- IMPACT CARDS -->
+    <div>
+      <div class="section-label">Estimated Annual Impact</div>
+      <div class="impact-grid">
+        <div class="ic" id="card-rev">
+          <div class="ic-top"><div class="ic-label">Revenue Growth</div><div class="ic-dot"></div></div>
+          <div class="ic-value" id="out-rev">&mdash;</div>
+          <div class="ic-sub">Additional approvals &times; loan margin</div>
+        </div>
+        <div class="ic" id="card-fraud">
+          <div class="ic-top"><div class="ic-label">Fraud Reduction</div><div class="ic-dot"></div></div>
+          <div class="ic-value" id="out-fraud">&mdash;</div>
+          <div class="ic-sub">Estimated loss reduction</div>
+        </div>
+        <div class="ic" id="card-ops">
+          <div class="ic-top"><div class="ic-label">Operational Savings</div><div class="ic-dot"></div></div>
+          <div class="ic-value" id="out-ops">&mdash;</div>
+          <div class="ic-sub">Reduced manual reviews</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOTAL + CSC -->
+    <div class="total-bar">
+      <div class="total-left">
+        <div class="total-label">Total Estimated Annual Value &rarr; Slide 18</div>
+        <div class="total-value" id="out-total">&mdash;</div>
+      </div>
+      <div>
+        <div class="csc-label">Current State Cost &rarr; Slide 4</div>
+        <div class="csc-value" id="out-csc">&mdash;</div>
+        <div class="csc-note">What the current state costs annually</div>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div>
+      <div class="section-label">Calculation Breakdown</div>
+      <div class="bk">
+        <div class="bkh">
+          <div class="bhc">Metric</div>
+          <div class="bhc">Calculation</div>
+          <div class="bhc">Result</div>
+        </div>
+
+        <div class="bks">
+          <div class="bksh" style="color:var(--green);background:#F0FBF5;">P1 &mdash; Revenue Growth</div>
+          <div class="br"><div class="bc">Annual applications</div><div class="bc">Monthly apps &times; 12</div><div class="bc" id="bd-annualApps">&mdash;</div></div>
+          <div class="br"><div class="bc">Additional approvals</div><div class="bc">Annual apps &times; approval lift %</div><div class="bc" id="bd-addApprovals">&mdash;</div></div>
+          <div class="br"><div class="bc">Revenue per loan</div><div class="bc">Avg. loan size &times; net margin %</div><div class="bc" id="bd-revPerLoan">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Revenue impact</div><div class="bc">Additional approvals &times; revenue per loan</div><div class="bc g" id="bd-revImpact">&mdash;</div></div>
+        </div>
+
+        <div class="bks">
+          <div class="bksh" style="color:var(--yellow);background:#FBF8F4;">P2 &mdash; Fraud Reduction</div>
+          <div class="br"><div class="bc">Current fraud loss</div><div class="bc">Portfolio &times; fraud loss rate %</div><div class="bc" id="bd-fraudLoss">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Fraud saving</div><div class="bc">Current fraud loss &times; reduction %</div><div class="bc a" id="bd-fraudSaving">&mdash;</div></div>
+        </div>
+
+        <div class="bks">
+          <div class="bksh" style="color:var(--cyan);background:#F3F8FB;">P3 &mdash; Operational Savings</div>
+          <div class="br"><div class="bc">Annual manual reviews</div><div class="bc">Annual apps &times; manual review rate %</div><div class="bc" id="bd-manualReviews">&mdash;</div></div>
+          <div class="br"><div class="bc">Reviews eliminated</div><div class="bc">Annual reviews &times; reduction %</div><div class="bc" id="bd-reviewsElim">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Operational saving</div><div class="bc">Eliminated reviews &times; cost per review</div><div class="bc c" id="bd-opsSaving">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROI -->
+    <div>
+      <div class="section-label">ROI vs Lean Investment</div>
+      <div class="roic">
+        <div class="roig">
+          <div class="rii"><div class="ril">Total Annual Value</div><div class="riv g" id="roi-total">&mdash;</div></div>
+          <div class="rii"><div class="ril">Lean Annual Cost</div><div class="riv" id="roi-cost">&mdash;</div></div>
+          <div class="rii"><div class="ril">Net Annual Benefit</div><div class="riv g" id="roi-net">&mdash;</div></div>
+          <div class="rii"><div class="ril">ROI Multiple</div><div class="riv g" id="roi-multiple">&mdash;</div></div>
+          <div class="rii"><div class="ril">Payback Period</div><div class="riv g" id="roi-payback">&mdash;</div></div>
+          <div class="rii"><div class="ril">Current State Cost</div><div class="riv r" id="roi-csc">&mdash;</div></div>
+        </div>
+        <div class="roi-footer">ROI multiple and payback period calculate once Lean annual cost is entered from the commercial team. Do not estimate this figure.</div>
+      </div>
+    </div>
+
+    <!-- EXPORT NOTE -->
+    <div class="enote">
+      <div class="enote-icon">&#128203;</div>
+      <div>
+        <div class="enote-title">Transferring to the Business Case Deck</div>
+        <div class="enote-body">
+          Copy Revenue Growth, Fraud Reduction and Operational Savings to <strong>slide 18</strong>.<br>
+          Copy Total Annual Value to <strong>slide 18</strong> and Current State Cost to <strong>slide 4</strong>.<br>
+          Add Lean Annual Cost to <strong>slide 18</strong> once confirmed by the commercial team.<br>
+          Label all figures as estimates based on discovery metrics when presenting.
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="pf-text">LEAN &mdash; Business Case Calculator &mdash; Internal Sales Use Only</div>
+      <div class="pf-text" id="footerDate"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const g = id => parseFloat($(id).value) || 0;
+function fSAR(n) {
+  if (!n || n === 0) return "\u2014";
+  if (n >= 1000000) return "SAR " + (n/1000000).toFixed(1) + "M";
+  if (n >= 1000) return "SAR " + Math.round(n/1000) + "K";
+  return "SAR " + Math.round(n).toLocaleString();
+}
+function fN(n) { return n > 0 ? n.toLocaleString("en-US", {maximumFractionDigits:0}) : "\u2014"; }
+function fX(n) { return n > 0 ? n.toFixed(1) + "x" : "\u2014"; }
+function fMo(n) {
+  if (!n || n <= 0) return "\u2014";
+  const mo = Math.ceil(n);
+  return mo < 12 ? mo + " months" : (mo/12).toFixed(1) + " years";
+}
+function update() {
+  const name = $("lenderName").value.trim();
+  $("nameDisplay").textContent = name || "\u2014";
+  const today = new Date().toLocaleDateString("en-GB", {day:"numeric",month:"long",year:"numeric"});
+  $("dateDisplay").textContent = today;
+  $("footerDate").textContent = today;
+  $("datestamp").textContent = today;
+
+  const monthlyApps   = g("monthlyApps");
+  const avgLoan       = g("avgLoan");
+  const netMargin     = g("netMargin") / 100;
+  const approvalLift  = g("approvalLift") / 100;
+  const portfolioSize = g("portfolioSize");
+  const fraudRate     = g("fraudRate") / 100;
+  const fraudRed      = g("fraudReduction") / 100;
+  const manualRate    = g("manualRate") / 100;
+  const costPerReview = g("costPerReview");
+  const reviewRed     = g("reviewReduction") / 100;
+  const leanCost      = g("leanCost");
+
+  const annualApps    = monthlyApps * 12;
+  const addApprovals  = annualApps * approvalLift;
+  const revPerLoan    = avgLoan * netMargin;
+  const revImpact     = addApprovals * revPerLoan;
+  const fraudLoss     = portfolioSize * fraudRate;
+  const fraudSaving   = fraudLoss * fraudRed;
+  const annualReviews = annualApps * manualRate;
+  const reviewsElim   = annualReviews * reviewRed;
+  const opsSaving     = reviewsElim * costPerReview;
+  const total         = revImpact + fraudSaving + opsSaving;
+  const cscTotal      = fraudLoss + (annualReviews * costPerReview);
+  const netBenefit    = leanCost > 0 ? total - leanCost : null;
+  const roiMult       = leanCost > 0 && total > 0 ? total / leanCost : null;
+  const payback       = leanCost > 0 && total > 0 ? (leanCost / (total / 12)) : null;
+
+  $("out-rev").textContent   = fSAR(revImpact);
+  $("out-fraud").textContent = fSAR(fraudSaving);
+  $("out-ops").textContent   = fSAR(opsSaving);
+  $("out-total").textContent = fSAR(total);
+  $("out-csc").textContent   = fSAR(cscTotal);
+
+  $("card-rev").className   = "ic" + (revImpact > 0   ? " active-g" : "");
+  $("card-fraud").className = "ic" + (fraudSaving > 0 ? " active-a" : "");
+  $("card-ops").className   = "ic" + (opsSaving > 0   ? " active-c" : "");
+
+  $("bd-annualApps").textContent   = fN(annualApps);
+  $("bd-addApprovals").textContent = fN(addApprovals);
+  $("bd-revPerLoan").textContent   = fSAR(revPerLoan);
+  $("bd-revImpact").textContent    = fSAR(revImpact);
+  $("bd-fraudLoss").textContent    = fSAR(fraudLoss);
+  $("bd-fraudSaving").textContent  = fSAR(fraudSaving);
+  $("bd-manualReviews").textContent = fN(annualReviews);
+  $("bd-reviewsElim").textContent  = fN(reviewsElim);
+  $("bd-opsSaving").textContent    = fSAR(opsSaving);
+
+  $("roi-total").textContent    = fSAR(total);
+  $("roi-cost").textContent     = leanCost > 0 ? fSAR(leanCost) : "Pending confirmation";
+  $("roi-net").textContent      = netBenefit !== null ? fSAR(netBenefit) : "Pending";
+  $("roi-multiple").textContent = roiMult !== null ? fX(roiMult) : "Pending";
+  $("roi-payback").textContent  = payback !== null ? fMo(payback) : "Pending";
+  $("roi-csc").textContent      = fSAR(cscTotal);
+}
+update();
+</script>
+</body>
+</html>
