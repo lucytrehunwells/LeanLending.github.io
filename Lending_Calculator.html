@@ -456,14 +456,16 @@ input::placeholder { color: var(--text-muted); }
 
 <script>
 const $ = id => document.getElementById(id);
-const g = id => {
+const g = (id, useDefault = false) => {
   const el = $(id);
   if (!el) return 0;
   const val = parseFloat(el.value);
   if (!isNaN(val)) return val;
-  // Fall back to placeholder so defaults are always live
-  const ph = parseFloat(el.placeholder);
-  return isNaN(ph) ? 0 : ph;
+  if (useDefault) {
+    const ph = parseFloat(el.placeholder);
+    return isNaN(ph) ? 0 : ph;
+  }
+  return 0;
 };
 function fSAR(n) {
   if (!n || n === 0) return "\u2014";
@@ -490,15 +492,15 @@ function update() {
   const approvalRate  = g("approvalRate") / 100;
   const avgLoan       = g("avgLoan");
   const netMargin     = g("netMargin") / 100;
-  const approvalLift  = g("approvalLift") / 100;
+  const approvalLift  = g("approvalLift", true) / 100;
   const portfolioSize = g("portfolioSize");
   const fraudRate     = g("fraudRate") / 100;
-  const fraudRed      = g("fraudReduction") / 100;
+  const fraudRed      = g("fraudReduction", true) / 100;
   const manualRate    = g("manualRate") / 100;
   const costPerReview = g("costPerReview");
-  const reviewRed     = g("reviewReduction") / 100;
+  const reviewRed     = g("reviewReduction", true) / 100;
   const errorRate     = g("errorRate") / 100;
-  const errorRed      = g("errorReduction") / 100;
+  const errorRed      = g("errorReduction", true) / 100;
   const leanCost      = g("leanCost");
   const addApprovals  = annualApps * approvalLift;
   const revPerLoan    = avgLoan * netMargin;
