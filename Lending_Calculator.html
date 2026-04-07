@@ -98,7 +98,7 @@ input::placeholder { color: var(--text-muted); }
 .tn-item { font-size: 11px; color: var(--text-sub); }
 
 /* IMPACT CARDS */
-.impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .ic {
   background: var(--surface); border: 1px solid var(--border); border-radius: 7px;
   padding: 16px; transition: border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
@@ -150,7 +150,7 @@ input::placeholder { color: var(--text-muted); }
 
 /* ROI */
 .roic { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 18px 20px; }
-.roig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; }
+.roig { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; }
 .rii { display: flex; flex-direction: column; gap: 3px; }
 .ril { font-size: 10px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
 .riv { font-weight: 700; font-size: 20px; color: var(--text-muted); letter-spacing: -0.3px; }
@@ -220,15 +220,15 @@ input::placeholder { color: var(--text-muted); }
       </div>
       <div class="fg">
         <div class="field">
-          <div class="flabel"><span class="tag tag-d">discovery</span> Monthly loan applications</div>
-          <input type="number" id="monthlyApps" placeholder="10000" oninput="update()">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Annual loan applications</div>
+          <input type="number" id="annualApps" placeholder="120000" oninput="update()">
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Current approval rate (%)</div>
           <input type="number" id="approvalRate" placeholder="45" oninput="update()">
         </div>
         <div class="field">
-          <div class="flabel"><span class="tag tag-d">discovery</span> Average loan size (SAR)</div>
+          <div class="flabel"><span class="tag tag-d">discovery</span> Average loan size (USD)</div>
           <input type="number" id="avgLoan" placeholder="4500" oninput="update()">
         </div>
         <div class="field">
@@ -252,7 +252,7 @@ input::placeholder { color: var(--text-muted); }
       </div>
       <div class="fg">
         <div class="field">
-          <div class="flabel"><span class="tag tag-d">discovery</span> Loan portfolio size (SAR)</div>
+          <div class="flabel"><span class="tag tag-d">discovery</span> Loan portfolio size (USD)</div>
           <input type="number" id="portfolioSize" placeholder="200000000" oninput="update()">
           <span class="fhint">Total outstanding loan book &mdash; optional</span>
         </div>
@@ -282,7 +282,7 @@ input::placeholder { color: var(--text-muted); }
           <span class="fhint">% of applications requiring manual underwriting</span>
         </div>
         <div class="field">
-          <div class="flabel"><span class="tag tag-d">discovery</span> Cost per manual review (SAR)</div>
+          <div class="flabel"><span class="tag tag-d">discovery</span> Cost per manual review (USD)</div>
           <input type="number" id="costPerReview" placeholder="30" oninput="update()">
           <span class="fhint">Include underwriter time + SIMAH / GOSI costs</span>
         </div>
@@ -290,6 +290,26 @@ input::placeholder { color: var(--text-muted); }
           <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Manual review reduction with Lean (%)</div>
           <input type="number" id="reviewReduction" placeholder="60" class="lean-input" oninput="update()">
           <div class="fassume">Adjust based on lender&rsquo;s current automation level.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PILLAR 4 -->
+    <div class="pillar">
+      <div class="ph">
+        <span class="pbadge">P4</span>
+        <div><div class="ptitle">Disbursement Risk</div><div class="psub">Payment errors from unverified accounts</div></div>
+      </div>
+      <div class="fg">
+        <div class="field">
+          <div class="flabel"><span class="tag tag-d">discovery</span> Disbursement error rate (%)</div>
+          <input type="number" id="errorRate" placeholder="0.2" oninput="update()">
+          <span class="fhint">% of disbursements sent to wrong or unverified accounts</span>
+        </div>
+        <div class="field">
+          <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Error reduction with Lean (%)</div>
+          <input type="number" id="errorReduction" placeholder="80" class="lean-input" oninput="update()">
+          <div class="fassume">IBAN verification is a binary check — 80% reduction is conservative.</div>
         </div>
       </div>
     </div>
@@ -302,7 +322,7 @@ input::placeholder { color: var(--text-muted); }
       </div>
       <div class="fg">
         <div class="field">
-          <div class="flabel"><span class="tag tag-c">commercial</span> Lean annual cost (SAR)</div>
+          <div class="flabel"><span class="tag tag-c">commercial</span> Lean annual cost (USD)</div>
           <input type="number" id="leanCost" placeholder="Leave blank until confirmed" oninput="update()">
           <span class="fhint">ROI and payback calculate once this is entered</span>
         </div>
@@ -321,11 +341,7 @@ input::placeholder { color: var(--text-muted); }
         <div class="lname" id="nameDisplay">&mdash;</div>
         <div class="ldate" id="dateDisplay"></div>
       </div>
-      <div class="transfer-note">
-        <div class="tn-label">Transfer figures to deck</div>
-        <div class="tn-item">Slide 18 &rarr; Revenue, Fraud, Ops, Total</div>
-        <div class="tn-item">Slide 4 &rarr; Current State Cost</div>
-      </div>
+
     </div>
 
     <!-- IMPACT CARDS -->
@@ -342,10 +358,15 @@ input::placeholder { color: var(--text-muted); }
           <div class="ic-value" id="out-fraud">&mdash;</div>
           <div class="ic-sub">Estimated loss reduction</div>
         </div>
-        <div class="ic" id="card-ops">
+        <div class="ic pu" id="card-ops">
           <div class="ic-top"><div class="ic-label">Operational Savings</div><div class="ic-dot"></div></div>
           <div class="ic-value" id="out-ops">&mdash;</div>
           <div class="ic-sub">Reduced manual reviews</div>
+        </div>
+        <div class="ic" id="card-disb" style="border-color:var(--border);">
+          <div class="ic-top"><div class="ic-label">Disbursement Risk</div><div class="ic-dot" id="disb-dot"></div></div>
+          <div class="ic-value" id="out-disb">&mdash;</div>
+          <div class="ic-sub">Error savings from IBAN verification</div>
         </div>
       </div>
     </div>
@@ -353,11 +374,11 @@ input::placeholder { color: var(--text-muted); }
     <!-- TOTAL + CSC -->
     <div class="total-bar">
       <div class="total-left">
-        <div class="total-label">Total Estimated Annual Value &rarr; Slide 18</div>
+        <div class="total-label">Total Estimated Annual Value</div>
         <div class="total-value" id="out-total">&mdash;</div>
       </div>
       <div>
-        <div class="csc-label">Current State Cost &rarr; Slide 4</div>
+        <div class="csc-label">Current State Cost</div>
         <div class="csc-value" id="out-csc">&mdash;</div>
         <div class="csc-note">What the current state costs annually</div>
       </div>
@@ -375,7 +396,7 @@ input::placeholder { color: var(--text-muted); }
 
         <div class="bks">
           <div class="bksh" style="color:var(--green);background:#F0FBF5;">P1 &mdash; Revenue Growth</div>
-          <div class="br"><div class="bc">Annual applications</div><div class="bc">Monthly apps &times; 12</div><div class="bc" id="bd-annualApps">&mdash;</div></div>
+          <div class="br"><div class="bc">Annual applications</div><div class="bc">From discovery input</div><div class="bc" id="bd-annualApps">&mdash;</div></div>
           <div class="br"><div class="bc">Additional approvals</div><div class="bc">Annual apps &times; approval lift %</div><div class="bc" id="bd-addApprovals">&mdash;</div></div>
           <div class="br"><div class="bc">Revenue per loan</div><div class="bc">Avg. loan size &times; net margin %</div><div class="bc" id="bd-revPerLoan">&mdash;</div></div>
           <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Revenue impact</div><div class="bc">Additional approvals &times; revenue per loan</div><div class="bc g" id="bd-revImpact">&mdash;</div></div>
@@ -393,6 +414,15 @@ input::placeholder { color: var(--text-muted); }
           <div class="br"><div class="bc">Reviews eliminated</div><div class="bc">Annual reviews &times; reduction %</div><div class="bc" id="bd-reviewsElim">&mdash;</div></div>
           <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Operational saving</div><div class="bc">Eliminated reviews &times; cost per review</div><div class="bc c" id="bd-opsSaving">&mdash;</div></div>
         </div>
+
+        <div class="bks">
+          <div class="bksh" style="color:var(--red);background:#FDF0F0;">P4 &mdash; Disbursement Risk Reduction</div>
+          <div class="br"><div class="bc">Annual loans disbursed</div><div class="bc">Annual apps &times; approval rate %</div><div class="bc" id="bd-annualDisb">&mdash;</div></div>
+          <div class="br"><div class="bc">Annual disbursement value</div><div class="bc">Annual loans &times; avg. loan size</div><div class="bc" id="bd-disbValue">&mdash;</div></div>
+          <div class="br"><div class="bc">Current error exposure</div><div class="bc">Disbursement value &times; error rate %</div><div class="bc" id="bd-disbExposure">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Disbursement risk saving</div><div class="bc">Error exposure &times; reduction %</div><div class="bc" id="bd-disbSaving" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
+        </div>
+
       </div>
     </div>
 
@@ -405,6 +435,7 @@ input::placeholder { color: var(--text-muted); }
           <div class="rii"><div class="ril">Lean Annual Cost</div><div class="riv" id="roi-cost">&mdash;</div></div>
           <div class="rii"><div class="ril">Net Annual Benefit</div><div class="riv g" id="roi-net">&mdash;</div></div>
           <div class="rii"><div class="ril">ROI Multiple</div><div class="riv g" id="roi-multiple">&mdash;</div></div>
+          <div class="rii"><div class="ril">ROI Percentage</div><div class="riv g" id="roi-pct">&mdash;</div></div>
           <div class="rii"><div class="ril">Payback Period</div><div class="riv g" id="roi-payback">&mdash;</div></div>
           <div class="rii"><div class="ril">Current State Cost</div><div class="riv r" id="roi-csc">&mdash;</div></div>
         </div>
@@ -413,17 +444,6 @@ input::placeholder { color: var(--text-muted); }
     </div>
 
     <!-- EXPORT NOTE -->
-    <div class="enote">
-      <div class="enote-icon">&#128203;</div>
-      <div>
-        <div class="enote-title">Transferring to the Business Case Deck</div>
-        <div class="enote-body">
-          Copy Revenue Growth, Fraud Reduction and Operational Savings to <strong>slide 18</strong>.<br>
-          Copy Total Annual Value to <strong>slide 18</strong> and Current State Cost to <strong>slide 4</strong>.<br>
-          Add Lean Annual Cost to <strong>slide 18</strong> once confirmed by the commercial team.<br>
-          Label all figures as estimates based on discovery metrics when presenting.
-        </div>
-      </div>
     </div>
 
     <div class="page-footer">
@@ -436,12 +456,20 @@ input::placeholder { color: var(--text-muted); }
 
 <script>
 const $ = id => document.getElementById(id);
-const g = id => parseFloat($(id).value) || 0;
+const g = id => {
+  const el = $(id);
+  if (!el) return 0;
+  const val = parseFloat(el.value);
+  if (!isNaN(val)) return val;
+  // Fall back to placeholder so defaults are always live
+  const ph = parseFloat(el.placeholder);
+  return isNaN(ph) ? 0 : ph;
+};
 function fSAR(n) {
   if (!n || n === 0) return "\u2014";
-  if (n >= 1000000) return "SAR " + (n/1000000).toFixed(1) + "M";
-  if (n >= 1000) return "SAR " + Math.round(n/1000) + "K";
-  return "SAR " + Math.round(n).toLocaleString();
+  if (n >= 1000000) return "USD " + (n/1000000).toFixed(1) + "M";
+  if (n >= 1000) return "USD " + Math.round(n/1000) + "K";
+  return "USD " + Math.round(n).toLocaleString();
 }
 function fN(n) { return n > 0 ? n.toLocaleString("en-US", {maximumFractionDigits:0}) : "\u2014"; }
 function fX(n) { return n > 0 ? n.toFixed(1) + "x" : "\u2014"; }
@@ -458,7 +486,8 @@ function update() {
   $("footerDate").textContent = today;
   $("datestamp").textContent = today;
 
-  const monthlyApps   = g("monthlyApps");
+  const annualApps    = g("annualApps");
+  const approvalRate  = g("approvalRate") / 100;
   const avgLoan       = g("avgLoan");
   const netMargin     = g("netMargin") / 100;
   const approvalLift  = g("approvalLift") / 100;
@@ -468,9 +497,9 @@ function update() {
   const manualRate    = g("manualRate") / 100;
   const costPerReview = g("costPerReview");
   const reviewRed     = g("reviewReduction") / 100;
+  const errorRate     = g("errorRate") / 100;
+  const errorRed      = g("errorReduction") / 100;
   const leanCost      = g("leanCost");
-
-  const annualApps    = monthlyApps * 12;
   const addApprovals  = annualApps * approvalLift;
   const revPerLoan    = avgLoan * netMargin;
   const revImpact     = addApprovals * revPerLoan;
@@ -479,23 +508,43 @@ function update() {
   const annualReviews = annualApps * manualRate;
   const reviewsElim   = annualReviews * reviewRed;
   const opsSaving     = reviewsElim * costPerReview;
-  const total         = revImpact + fraudSaving + opsSaving;
-  const cscTotal      = fraudLoss + (annualReviews * costPerReview);
+  // Disbursement risk
+  const annualDisb    = annualApps * approvalRate;
+  const disbValue     = annualDisb * avgLoan;
+  const disbExposure  = disbValue * errorRate;
+  const disbSaving    = disbExposure * errorRed;
+
+  const total         = revImpact + fraudSaving + opsSaving + disbSaving;
+  const cscTotal      = fraudLoss + (annualReviews * costPerReview) + disbExposure;
   const netBenefit    = leanCost > 0 ? total - leanCost : null;
   const roiMult       = leanCost > 0 && total > 0 ? total / leanCost : null;
+  const roiPct        = leanCost > 0 && total > 0 ? ((total - leanCost) / leanCost) * 100 : null;
   const payback       = leanCost > 0 && total > 0 ? (leanCost / (total / 12)) : null;
 
   $("out-rev").textContent   = fSAR(revImpact);
   $("out-fraud").textContent = fSAR(fraudSaving);
   $("out-ops").textContent   = fSAR(opsSaving);
+  $("out-disb").textContent  = fSAR(disbSaving);
   $("out-total").textContent = fSAR(total);
   $("out-csc").textContent   = fSAR(cscTotal);
 
   $("card-rev").className   = "ic" + (revImpact > 0   ? " active-g" : "");
   $("card-fraud").className = "ic" + (fraudSaving > 0 ? " active-a" : "");
   $("card-ops").className   = "ic" + (opsSaving > 0   ? " active-c" : "");
+  const disbCard = document.getElementById("card-disb");
+  if (disbCard) {
+    disbCard.style.borderColor = disbSaving > 0 ? "var(--red)" : "var(--border)";
+    const disbVal = document.getElementById("out-disb");
+    if (disbVal) disbVal.style.color = disbSaving > 0 ? "var(--red)" : "var(--text-muted)";
+    const disbDot = document.getElementById("disb-dot");
+    if (disbDot) disbDot.style.background = disbSaving > 0 ? "var(--red)" : "var(--border)";
+  }
 
   $("bd-annualApps").textContent   = fN(annualApps);
+  $("bd-annualDisb").textContent   = fN(annualDisb);
+  $("bd-disbValue").textContent    = fSAR(disbValue);
+  $("bd-disbExposure").textContent = fSAR(disbExposure);
+  $("bd-disbSaving").textContent   = fSAR(disbSaving);
   $("bd-addApprovals").textContent = fN(addApprovals);
   $("bd-revPerLoan").textContent   = fSAR(revPerLoan);
   $("bd-revImpact").textContent    = fSAR(revImpact);
@@ -509,6 +558,7 @@ function update() {
   $("roi-cost").textContent     = leanCost > 0 ? fSAR(leanCost) : "Pending confirmation";
   $("roi-net").textContent      = netBenefit !== null ? fSAR(netBenefit) : "Pending";
   $("roi-multiple").textContent = roiMult !== null ? fX(roiMult) : "Pending";
+  $("roi-pct").textContent      = roiPct !== null ? Math.round(roiPct).toLocaleString() + "%" : "Pending";
   $("roi-payback").textContent  = payback !== null ? fMo(payback) : "Pending";
   $("roi-csc").textContent      = fSAR(cscTotal);
 }
