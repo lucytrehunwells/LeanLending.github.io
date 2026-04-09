@@ -221,24 +221,24 @@ input::placeholder { color: var(--text-muted); }
       <div class="fg">
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Annual loan applications</div>
-          <input type="number" id="annualApps" placeholder="120000" oninput="update()">
+          <input type="number" id="annualApps" autocomplete="off" placeholder="120000" oninput="update()">
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Current approval rate (%)</div>
-          <input type="number" id="approvalRate" placeholder="45" oninput="update()">
+          <input type="number" id="approvalRate" autocomplete="off" placeholder="45" oninput="update()">
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Average loan size (USD)</div>
-          <input type="number" id="avgLoan" placeholder="4500" oninput="update()">
+          <input type="number" id="avgLoan" autocomplete="off" placeholder="4500" oninput="update()">
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Net margin per loan (%)</div>
-          <input type="number" id="netMargin" placeholder="8" oninput="update()">
+          <input type="number" id="netMargin" autocomplete="off" placeholder="8" oninput="update()">
           <span class="fhint">Yield or profit margin on each loan</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Approval rate increase with Lean (%)</div>
-          <input type="number" id="approvalLift" placeholder="3" class="lean-input" oninput="update()">
+          <input type="number" id="approvalLift" autocomplete="off" placeholder="3" class="lean-input" oninput="update()">
           <div class="fassume">Conservative default. Adjust based on lender&rsquo;s current data quality.</div>
         </div>
       </div>
@@ -253,17 +253,17 @@ input::placeholder { color: var(--text-muted); }
       <div class="fg">
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Loan portfolio size (USD)</div>
-          <input type="number" id="portfolioSize" placeholder="200000000" oninput="update()">
+          <input type="number" id="portfolioSize" autocomplete="off" placeholder="200000000" oninput="update()">
           <span class="fhint">Total outstanding loan book &mdash; optional</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Fraud / bad debt loss rate (%)</div>
-          <input type="number" id="fraudRate" placeholder="1.5" oninput="update()">
+          <input type="number" id="fraudRate" autocomplete="off" placeholder="1.5" oninput="update()">
           <span class="fhint">Optional &mdash; leave blank if not available</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Fraud reduction with Lean (%)</div>
-          <input type="number" id="fraudReduction" placeholder="40" class="lean-input" oninput="update()">
+          <input type="number" id="fraudReduction" autocomplete="off" placeholder="40" class="lean-input" oninput="update()">
           <div class="fassume">Bank-verified income significantly reduces misrepresentation.</div>
         </div>
       </div>
@@ -278,17 +278,17 @@ input::placeholder { color: var(--text-muted); }
       <div class="fg">
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Manual review rate (%)</div>
-          <input type="number" id="manualRate" placeholder="35" oninput="update()">
+          <input type="number" id="manualRate" autocomplete="off" placeholder="35" oninput="update()">
           <span class="fhint">% of applications requiring manual underwriting</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Cost per manual review (USD)</div>
-          <input type="number" id="costPerReview" placeholder="30" oninput="update()">
+          <input type="number" id="costPerReview" autocomplete="off" placeholder="30" oninput="update()">
           <span class="fhint">Include underwriter time + SIMAH / GOSI costs</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Manual review reduction with Lean (%)</div>
-          <input type="number" id="reviewReduction" placeholder="60" class="lean-input" oninput="update()">
+          <input type="number" id="reviewReduction" autocomplete="off" placeholder="60" class="lean-input" oninput="update()">
           <div class="fassume">Adjust based on lender&rsquo;s current automation level.</div>
         </div>
       </div>
@@ -303,12 +303,12 @@ input::placeholder { color: var(--text-muted); }
       <div class="fg">
         <div class="field">
           <div class="flabel"><span class="tag tag-d">discovery</span> Disbursement error rate (%)</div>
-          <input type="number" id="errorRate" placeholder="0.2" oninput="update()">
+          <input type="number" id="errorRate" autocomplete="off" placeholder="0.2" oninput="update()">
           <span class="fhint">% of disbursements sent to wrong or unverified accounts</span>
         </div>
         <div class="field">
           <div class="flabel"><span class="tag tag-l">lean&nbsp;estimate</span> Error reduction with Lean (%)</div>
-          <input type="number" id="errorReduction" placeholder="80" class="lean-input" oninput="update()">
+          <input type="number" id="errorReduction" autocomplete="off" placeholder="80" class="lean-input" oninput="update()">
           <div class="fassume">IBAN verification is a binary check — 80% reduction is conservative.</div>
         </div>
       </div>
@@ -323,7 +323,7 @@ input::placeholder { color: var(--text-muted); }
       <div class="fg">
         <div class="field">
           <div class="flabel"><span class="tag tag-c">commercial</span> Lean annual cost (USD)</div>
-          <input type="number" id="leanCost" placeholder="Leave blank until confirmed" oninput="update()">
+          <input type="number" id="leanCost" autocomplete="off" placeholder="Leave blank until confirmed" oninput="update()">
           <span class="fhint">ROI and payback calculate once this is entered</span>
         </div>
       </div>
@@ -400,11 +400,12 @@ input::placeholder { color: var(--text-muted); }
           <div class="br"><div class="bc">Additional approvals</div><div class="bc">Annual apps &times; approval lift %</div><div class="bc" id="bd-addApprovals">&mdash;</div></div>
           <div class="br"><div class="bc">Revenue per loan</div><div class="bc">Avg. loan size &times; net margin %</div><div class="bc" id="bd-revPerLoan">&mdash;</div></div>
           <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Revenue impact</div><div class="bc">Additional approvals &times; revenue per loan</div><div class="bc g" id="bd-revImpact">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--red);">Revenue at stake *</div><div class="bc" style="color:var(--text-sub);">Annual apps &times; approval lift % &times; avg. loan &times; margin</div><div class="bc" id="bd-cscRev" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
         </div>
 
         <div class="bks">
           <div class="bksh" style="color:var(--yellow);background:#FBF8F4;">P2 &mdash; Fraud Reduction</div>
-          <div class="br"><div class="bc">Current fraud loss</div><div class="bc">Portfolio &times; fraud loss rate %</div><div class="bc" id="bd-fraudLoss">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--red);">Current fraud loss</div><div class="bc" style="color:var(--text-sub);">Portfolio &times; fraud loss rate %</div><div class="bc" id="bd-fraudLoss" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
           <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Fraud saving</div><div class="bc">Current fraud loss &times; reduction %</div><div class="bc a" id="bd-fraudSaving">&mdash;</div></div>
         </div>
 
@@ -413,14 +414,15 @@ input::placeholder { color: var(--text-muted); }
           <div class="br"><div class="bc">Annual manual reviews</div><div class="bc">Annual apps &times; manual review rate %</div><div class="bc" id="bd-manualReviews">&mdash;</div></div>
           <div class="br"><div class="bc">Reviews eliminated</div><div class="bc">Annual reviews &times; reduction %</div><div class="bc" id="bd-reviewsElim">&mdash;</div></div>
           <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Operational saving</div><div class="bc">Eliminated reviews &times; cost per review</div><div class="bc c" id="bd-opsSaving">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--red);">Annual manual review cost</div><div class="bc" style="color:var(--text-sub);">Annual reviews &times; cost per review</div><div class="bc" id="bd-cscOps" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
         </div>
 
         <div class="bks">
           <div class="bksh" style="color:var(--red);background:#FDF0F0;">P4 &mdash; Disbursement Risk Reduction</div>
           <div class="br"><div class="bc">Annual loans disbursed</div><div class="bc">Annual apps &times; approval rate %</div><div class="bc" id="bd-annualDisb">&mdash;</div></div>
           <div class="br"><div class="bc">Annual disbursement value</div><div class="bc">Annual loans &times; avg. loan size</div><div class="bc" id="bd-disbValue">&mdash;</div></div>
-          <div class="br"><div class="bc">Current error exposure</div><div class="bc">Disbursement value &times; error rate %</div><div class="bc" id="bd-disbExposure">&mdash;</div></div>
-          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Disbursement risk saving</div><div class="bc">Error exposure &times; reduction %</div><div class="bc" id="bd-disbSaving" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--red);">Current error exposure</div><div class="bc" style="color:var(--text-sub);">Disbursement value &times; error rate %</div><div class="bc" id="bd-disbExposure" style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
+          <div class="br"><div class="bc" style="font-weight:600;color:var(--text);">Disbursement risk saving</div><div class="bc">Error exposure &times; reduction %</div><div class="bc" id="bd-disbSaving" style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:500;">&mdash;</div></div>
         </div>
 
       </div>
@@ -440,6 +442,7 @@ input::placeholder { color: var(--text-muted); }
           <div class="rii"><div class="ril">Current State Cost</div><div class="riv r" id="roi-csc">&mdash;</div></div>
         </div>
         <div class="roi-footer">ROI multiple and payback period calculate once Lean annual cost is entered from the commercial team. Do not estimate this figure.</div>
+        <div class="roi-footer" style="color:var(--yellow);margin-top:6px;">* Revenue at stake is based on Lean&rsquo;s estimated approval rate increase. Caveat this figure when presenting to the client.</div>
       </div>
     </div>
 
@@ -456,17 +459,32 @@ input::placeholder { color: var(--text-muted); }
 
 <script>
 const $ = id => document.getElementById(id);
+const touched = new Set();
 const g = (id, useDefault = false) => {
   const el = $(id);
   if (!el) return 0;
   const val = parseFloat(el.value);
   if (!isNaN(val)) return val;
-  if (useDefault) {
+  // Only use placeholder default if field has never been touched by user
+  if (useDefault && !touched.has(id)) {
     const ph = parseFloat(el.placeholder);
     return isNaN(ph) ? 0 : ph;
   }
   return 0;
 };
+// Mark fields as touched when user focuses them
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input[type="number"]').forEach(el => {
+    el.addEventListener('focus', () => touched.add(el.id));
+    el.addEventListener('input', () => touched.add(el.id));
+    // Prevent scroll wheel and keyboard arrows from changing values
+    el.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') e.preventDefault();
+    });
+  });
+});
+
 function fSAR(n) {
   if (!n || n === 0) return "\u2014";
   if (n >= 1000000) return "USD " + (n/1000000).toFixed(1) + "M";
@@ -499,7 +517,7 @@ function update() {
   const manualRate    = g("manualRate") / 100;
   const costPerReview = g("costPerReview");
   const reviewRed     = g("reviewReduction", true) / 100;
-  const errorRate     = g("errorRate") / 100;
+  const errorRate     = g("errorRate", true) / 100;
   const errorRed      = g("errorReduction", true) / 100;
   const leanCost      = g("leanCost");
   const addApprovals  = annualApps * approvalLift;
@@ -535,14 +553,19 @@ function update() {
   $("card-ops").className   = "ic" + (opsSaving > 0   ? " active-c" : "");
   const disbCard = document.getElementById("card-disb");
   if (disbCard) {
-    disbCard.style.borderColor = disbSaving > 0 ? "var(--red)" : "var(--border)";
+    disbCard.style.borderColor = disbSaving > 0 ? "var(--green)" : "var(--border)";
     const disbVal = document.getElementById("out-disb");
-    if (disbVal) disbVal.style.color = disbSaving > 0 ? "var(--red)" : "var(--text-muted)";
+    if (disbVal) disbVal.style.color = disbSaving > 0 ? "var(--green)" : "var(--text-muted)";
     const disbDot = document.getElementById("disb-dot");
-    if (disbDot) disbDot.style.background = disbSaving > 0 ? "var(--red)" : "var(--border)";
+    if (disbDot) disbDot.style.background = disbSaving > 0 ? "var(--green)" : "var(--border)";
   }
 
   $("bd-annualApps").textContent   = fN(annualApps);
+  // Current state cost lines
+  const cscRev  = revImpact;  // same calculation — revenue at stake
+  const cscOps  = annualReviews * costPerReview;  // full cost before reduction
+  $("bd-cscRev").textContent  = fSAR(cscRev);
+  $("bd-cscOps").textContent  = fSAR(cscOps);
   $("bd-annualDisb").textContent   = fN(annualDisb);
   $("bd-disbValue").textContent    = fSAR(disbValue);
   $("bd-disbExposure").textContent = fSAR(disbExposure);
